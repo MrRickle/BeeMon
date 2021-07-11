@@ -1,7 +1,6 @@
-package com.example.myapplication
+package com.example.BeeMon
 
 import timber.log.Timber
-import android.app.Application
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -21,7 +20,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.BeeMon.databinding.ActivityMainBinding
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
