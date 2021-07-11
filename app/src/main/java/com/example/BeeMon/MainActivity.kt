@@ -5,10 +5,13 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -65,6 +68,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         Timber.i("Content view bound to root")
 
+        promptEnableBluetooth()
+//        startBleScan()
+
+
         setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -112,5 +119,41 @@ class MainActivity : AppCompatActivity() {
     private fun Activity.requestPermission(permission: String, requestCode: Int) {
         ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
     }
+
+    /*******************************************
+     * Private functions
+     *******************************************/
+
+    private fun promptEnableBluetooth() {
+        if (!bluetoothAdapter.isEnabled) {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
+            Timber.i("Bluetooth enabled")
+        } else {
+            Timber.i("Bluetooth already enabled")
+        }
+    }
+
+/*
+    private fun startBleScan() {
+            val filters:List<ScanFilter>  //added
+            filters = ArrayList()  //added
+            val ime = "BeeHive"  //added
+            val filter = ScanFilter.Builder().setDeviceName(ime).build()   //added
+            filters.add(filter)   //added
+
+            scanResults.clear()
+            scanResultAdapter.notifyDataSetChanged()
+            bleScanner.startScan(filters, scanSettings, scanCallback)  // filters was null
+            isScanning = true
+    }
+
+
+    private fun stopBleScan() {
+        bleScanner.stopScan(scanCallback)
+        isScanning = false
+    }
+
+*/
 
 }
