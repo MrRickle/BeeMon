@@ -1,11 +1,18 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    //id("org.jetbrains.kotlin.android.extensions") version "1.5.20-RC"
 }
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
+
+    buildFeatures {
+        viewBinding = true
+    }
+
 
     defaultConfig {
         applicationId "com.example.myapplication"

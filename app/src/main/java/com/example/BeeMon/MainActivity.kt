@@ -5,6 +5,7 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
@@ -24,6 +25,9 @@ import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.BeeMon.databinding.ActivityMainBinding
+import com.punchthrough.blestarterappandroid.ble.ConnectionEventListener
+import com.punchthrough.blestarterappandroid.ble.ConnectionManager
+
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
@@ -51,6 +55,17 @@ class MainActivity : AppCompatActivity() {
         }
 
     private val scanResults = mutableListOf<ScanResult>()
+    private val scanResultAdapter: ScanResultAdapter by lazy {
+        ScanResultAdapter(scanResults) { result ->
+            if (isScanning) {
+                stopBleScan()
+            }
+            with(result.device) {
+                Timber.i("Connecting to $address")
+                ConnectionManager.connect(this, this@MainActivity)
+            }
+        }
+    }
 
     private val isLocationPermissionGranted
         get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -63,13 +78,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if(BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
-            binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         Timber.i("Timber planted")
-        setContentView(binding.root)
+
+//        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         Timber.i("Content view bound to root")
 
+
+
         promptEnableBluetooth()
-//        startBleScan()
+        startBleScan()
 
 
         setSupportActionBar(binding.toolbar)
@@ -134,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-/*
+
     private fun startBleScan() {
             val filters:List<ScanFilter>  //added
             filters = ArrayList()  //added
@@ -153,7 +173,60 @@ class MainActivity : AppCompatActivity() {
         bleScanner.stopScan(scanCallback)
         isScanning = false
     }
+    private fun requestLocationPermission() {
+        if (isLocationPermissionGranted) {
+            return
+        }
+        runOnUiThread {
+            alert {
+                title = "Location permission required"
+                message = "Starting from Android M (6.0), the system requires apps to be granted " +
+                        "location access in order to scan for BLE devices."
+                isCancelable = false
+                positiveButton(android.R.string.ok) {
+                    requestPermission(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        LOCATION_PERMISSION_REQUEST_CODE
+                    )
+                }
+            }.show()
+        }
+    }
 
-*/
+    private fun startBleScan() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
+            requestLocationPermission()
+        } else {
+            scanResults.clear()
+            scanResultAdapter.notifyDataSetChanged()
+            bleScanner.startScan(null, scanSettings, scanCallback)
+            isScanning = true
+        }
+    }
 
-}
+    /*******************************************
+     * Callback bodies
+     *******************************************/
+
+    private val scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val indexQuery = scanResults.indexOfFirst { it.device.address == result.device.address }
+            if (indexQuery != -1) { // A scan result already exists with the same address
+                scanResults[indexQuery] = result
+                scanResultAdapter.notifyItemChanged(indexQuery)
+            } else {
+                with(result.device) {
+                    Timber.i("Found BLE device! Name: ${name ?: "Unnamed"}, address: $address")
+                }
+                scanResults.add(result)
+                scanResultAdapter.notifyItemInserted(scanResults.size - 1)
+            }
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            Timber.e("onScanFailed: code $errorCode")
+        }
+    }
+
+
+    }
