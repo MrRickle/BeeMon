@@ -1,10 +1,11 @@
-package com.example.BeeMon
+package com.example.beemon
 import android.bluetooth.le.ScanResult
 import android.util.Log
 import android.view.View
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.beemon.R
 import kotlinx.android.synthetic.main.row_scan_result.view.device_name
 import kotlinx.android.synthetic.main.row_scan_result.view.mac_address
 import kotlinx.android.synthetic.main.row_scan_result.view.signal_strength
@@ -15,7 +16,8 @@ class ScanResultAdapter(
 ) : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-           val view = LayoutInflater.from(parent.context).inflate(R.layout.content_main
+           val view = LayoutInflater.from(parent.context).inflate(
+               R.layout.content_main
            ,
             parent,
             false
