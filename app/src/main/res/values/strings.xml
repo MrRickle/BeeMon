@@ -7,8 +7,15 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="device_name">BeeHive</string>
+    <string name="device_address">2B:0E:27:A5:7F:DB</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="beemon_description">beemon main screen</string>
     <string name="action_button_description">Describe Action</string>
+    <string name="action_button_check_device_name">Check Name</string>
+    <string name="action_button_check_device_address">Check Address</string>
+    <string name="device_name_text">----------</string>
+    <string name="device_address_text">----------</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
