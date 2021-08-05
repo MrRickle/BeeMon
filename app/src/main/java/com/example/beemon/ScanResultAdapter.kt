@@ -16,70 +16,49 @@
 
 package com.example.beemon
 
-import android.bluetooth.le.ScanResult
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.beemon.databinding.RowScanResultBinding
 
 class ScanResultAdapter(
-    private val items: List<ScanResult>,
-    private val onClickListener: ((device: ScanResult) -> Unit)
-) : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
-    private var oldScanItemsList=emptyList<com.example.beemon.ScanItem>()
-    // create an inner class with name ViewHolder
-    //It takes a view argument, in which pass the generated class of single_item.xml
-    // ie SingleItemBinding and in the RecyclerView.ViewHolder(binding.root) pass it like this
-    inner class ViewHolder(val binding: RowScanResultBinding) : RecyclerView.ViewHolder(binding.root)
+    private var scanItemList: MutableList<ScanItem>,
+    private val clickListener: (ScanItem) -> Unit) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = RowScanResultBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
 
-        return ViewHolder(binding)
-    }
-    // bind the items with each item of the list languageList which than will be
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            // LayoutInflater: takes ID from layout defined in XML.
+            // Instantiates the layout XML into corresponding View objects.
+            // Use context from main app -> also supplies theme layout values!
+            val inflater = LayoutInflater.from(parent.context)
+            // Inflate XML. Last parameter: don't immediately attach new view to the parent view group
+            val binding = RowScanResultBinding.inflate(inflater, parent, false)
+            return ScanItemViewHolder(binding)
+        }
+
+    // bind the items with each item of the list scanItemList which than will be
     // shown in recycler view
     // to keep it simple we are not setting any image data to view
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        with(holder){
-            with(oldScanItemsList[position]){
-                binding.deviceName.text = this.itemName
-                binding.macAddress.text = this.itemMacAddress
-                binding.signalStrength.text = this.itemSignalStrength
-            }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        // Populate ViewHolder with data that corresponds to the position in the list
+        // which we are told to load
+        (holder as ScanItemViewHolder).bind(scanItemList[position], clickListener)
+    }
+
+    override fun getItemCount() = scanItemList.size
+
+    // create an inner class with name ScanItemViewHolder
+    //It takes a view argument, in which pass the generated class of single_item.xml
+    // ie SingleItemBinding and in the RecyclerView.ViewHolder(binding.root) pass it like this
+    inner class ScanItemViewHolder(private val binding: RowScanResultBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ScanItem, clickListener: (ScanItem) -> Unit) {
+            binding.deviceName.text = item.itemName
+            binding.macAddress.text = item.itemMacAddress
+            binding.signalStrength.text = item.itemSignalStrength
+            binding.root.setOnClickListener { clickListener(item) }
         }
+
     }
-
-    override fun getItemCount() = oldScanItemsList.size
-
-    //
-    fun setData(newScanItemList : List<ScanItem>){
-        val diffUtil = MyDiffUtil(oldScanItemsList , newScanItemList)
-        // it calculates the different items of the oldLanguageList and newLanguageList
-        val diffResult = DiffUtil.calculateDiff(diffUtil)
-        // assign oldLanguageList to newLanguageList
-        oldScanItemsList = newScanItemList
-        diffResult.dispatchUpdatesTo(this)
-    }
-
-
-//    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        val item = items[position]
-//        holder.bind(item)
-//    }
-//
-//    class ViewHolder(
-//        private val view: View,
-//        private val onClickListener: ((device: ScanResult) -> Unit)
-//    ) : RecyclerView.ViewHolder(view) {
-//
-//        fun bind(result: ScanResult) {
-//            view.device_name.text = result.device.name ?: "Unnamed"
-//            view.mac_address.text = result.device.address
-//            view.signal_strength.text = "${result.rssi} dBm"
-//            view.setOnClickListener { onClickListener.invoke(result) }
-//        }
-//    }
 }

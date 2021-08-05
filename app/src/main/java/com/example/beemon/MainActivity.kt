@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private var connectedName = "------------"
     private var connectedAddress = "------------"
 
-    public val bluetoothAdapter: BluetoothAdapter by lazy {
+    val bluetoothAdapter: BluetoothAdapter by lazy {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
@@ -98,6 +98,7 @@ class MainActivity : AppCompatActivity() {
             Timber.i("Bluetooth already enabled")
         }
     }
+
 
 }
 
